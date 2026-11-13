@@ -1,19 +1,30 @@
-pipeline{
-  agent any
-  stages{
-    stage("Bulid"){
-      steps{
-          echo 'building the project'
+pipeline {
+    agent any
+    environment
+    {
+      Name = "Praveen"
     }
-     stage("test"){
-       steps{
-          echo 'testing the project '
-       }
+    parameters 
+    {
+      string defaultValue: 'Babu', name: 'LastName'
     }
-     stage("deploy"){
-       steps{
-          echo 'deploying the project '
-       }
+
+    tools {
+        maven 'mymaven'
     }
-  }
+
+    stages {
+        stage('build') {
+            steps {
+                 bat 'mvn clean package'
+                 echo "Hello $Name! ${params.LastName}"
+            }
+
+            post {
+                success {
+                    archiveArtifacts artifacts: '**/target/*.war', followSymlinks: false
+                }
+            }
+        }
+    }
 }
